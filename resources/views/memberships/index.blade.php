@@ -20,11 +20,9 @@
                 <form method="POST" action="{{ route('memberships.purchase', $membership->id) }}" class="mt-4">
                     @csrf
                     <button 
-                        type="submit"
-                        class="px-4 py-2 rounded font-semibold 
-                            {{ in_array($membership->id, $purchasedIds) 
-                                ? 'bg-gray-400 text-white opacity-70 cursor-not-allowed' 
-                                : 'bg-blue-600 hover:bg-blue-700 text-white' }}"
+                        type="submit" 
+                        class="px-4 py-2 rounded 
+                            {{ in_array($membership->id, $purchasedIds) ? 'bg-gray-300 text-black cursor-not-allowed opacity-70' : 'bg-blue-600 hover:bg-blue-700 text-white' }}"
                         {{ in_array($membership->id, $purchasedIds) ? 'disabled' : '' }}>
                         {{ in_array($membership->id, $purchasedIds) ? 'Purchased' : 'Purchase' }}
                     </button>
