@@ -17,16 +17,15 @@
                 <p>Price: ${{ number_format($membership->price, 2) }}</p>
                 <p>Duration: {{ $membership->duration_days }} days</p>
 
-                <form method="POST" action="{{ route('memberships.purchase', $membership->id) }}" class="mt-4">
-                    @csrf
-                    <button 
-                        type="submit" 
-                        class="px-4 py-2 rounded 
-                            {{ in_array($membership->id, $purchasedIds) ? 'bg-gray-300 text-black cursor-not-allowed opacity-70' : 'bg-blue-600 hover:bg-blue-700 text-white' }}"
-                        {{ in_array($membership->id, $purchasedIds) ? 'disabled' : '' }}>
-                        {{ in_array($membership->id, $purchasedIds) ? 'Purchased' : 'Purchase' }}
-                    </button>
-                </form>
+                @php
+                    $payment = auth()->user()->payments->where('membership_id', $membership->id)->sortByDesc('paid_at')->first();
+                @endphp
+                @if($payment && $payment->stripe_receipt_url)
+                    <span class="inline-block mt-4 px-4 py-2 rounded bg-green-500 text-white">Purchased</span>
+                    <a href="{{ $payment->stripe_receipt_url }}" target="_blank" class="inline-block mt-4 ml-2 bg-blue-600 hover:bg-blue-800 text-white px-3 py-1 rounded text-xs font-semibold transition">Download Receipt</a>
+                @else
+                    <a href="{{ route('memberships.pay', $membership->id) }}" class="inline-block mt-4 px-4 py-2 rounded bg-blue-600 hover:bg-blue-700 text-white font-semibold transition">Pay Now</a>
+                @endif
             </div>
         @endforeach
     </div>

@@ -12,7 +12,9 @@ class PaymentController extends Controller
      */
     public function index()
     {
-        //
+        $user = auth()->user();
+        $payments = $user->payments()->with('membership')->orderByDesc('paid_at')->get();
+        return view('payments', compact('payments'));
     }
 
     /**

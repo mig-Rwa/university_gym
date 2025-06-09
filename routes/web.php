@@ -22,17 +22,18 @@ Route::get('/dashboard', function () {
 
 
 Route::middleware(['auth'])->group(function () {
+    Route::get('/pay', [\App\Http\Controllers\StripePaymentController::class, 'pay'])->name('stripe.pay');
+    Route::get('/pay/success', [\App\Http\Controllers\StripePaymentController::class, 'success'])->name('stripe.success');
+    Route::get('/pay/cancel', [\App\Http\Controllers\StripePaymentController::class, 'cancel'])->name('stripe.cancel');
     Route::get('/memberships', [MembershipController::class, 'index'])->name('memberships.index');
+    Route::get('/memberships/pay/{id}', [MembershipController::class, 'pay'])->name('memberships.pay');
+    Route::get('/memberships/success/{id}', [MembershipController::class, 'success'])->name('memberships.success');
     Route::post('/memberships/purchase/{id}', [MembershipController::class, 'purchase'])->name('memberships.purchase');
-    Route::get('/pool-sessions', function () {
-        return view('pool');
-    })->name('pool.index');
-    Route::get('/court-bookings', function () {
-        return view('courts');
-    })->name('courts.index');
-    Route::get('/payment-history', function () {
-        return view('payments');
-    })->name('payments.history');
+    Route::get('/pool-sessions', [\App\Http\Controllers\PoolBookingController::class, 'index'])->name('pool.index');
+    Route::post('/pool-sessions/book', [\App\Http\Controllers\PoolBookingController::class, 'store'])->name('pool.book');
+    Route::get('/court-bookings', [\App\Http\Controllers\CourtBookingController::class, 'index'])->name('courts.index');
+    Route::post('/court-bookings/book', [\App\Http\Controllers\CourtBookingController::class, 'store'])->name('courts.book');
+    Route::get('/payment-history', [\App\Http\Controllers\PaymentController::class, 'index'])->name('payments.history');
 });
 
 Route::middleware('auth')->group(function () {

@@ -14,6 +14,8 @@ class Payment extends Model
         'membership_id',
         'amount',
         'paid_at',
+        'stripe_payment_id',
+        'stripe_receipt_url',
     ];
 
     public function user()

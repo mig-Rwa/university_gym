@@ -13,32 +13,57 @@
             </span>
             <h2 class="text-2xl font-bold">Pool Sessions</h2>
         </div>
-        <div class="mb-4 text-uni-red font-semibold text-lg">Available Pool Sessions</div>
+        @if(session('success'))
+            <div class="mb-4 bg-green-600 text-white p-2 rounded">{{ session('success') }}</div>
+        @endif
+        @if($errors->any())
+            <div class="mb-4 bg-red-600 text-white p-2 rounded">
+                <ul class="list-disc pl-5">
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+        <form action="{{ route('pool.book') }}" method="POST" class="mb-8 bg-gray-800 p-4 rounded-lg">
+            @csrf
+            <div class="flex flex-col md:flex-row md:space-x-4 items-center">
+                <div class="mb-2 md:mb-0 flex-1">
+                    <select name="slot_id" id="slot_id" class="w-full px-3 py-2 rounded bg-gray-700 text-white" required>
+                        <option value="">Select Pool Slot</option>
+                    </select>
+                </div>
+                <div class="mb-2 md:mb-0 flex-1">
+                    <input type="date" name="date" id="date" class="w-full px-3 py-2 rounded bg-gray-700 text-white" value="{{ date('Y-m-d') }}" required>
+                </div>
+            </div>
+            <div id="slotDetails" class="text-gray-300 text-sm mt-2"></div>
+            <button type="submit" class="mt-3 bg-uni-red hover:bg-red-700 text-white font-semibold px-6 py-2 rounded transition">Book Pool Session</button>
+        </form>
+        <script>
+            window.poolSlotsData = @json($slots);
+            window.userPoolBookings = @json($poolBookings);
+        </script>
+        <script src="{{ asset('js/booking_slots.js') }}"></script>
+        <div class="mb-4 text-uni-red font-semibold text-lg">Your Pool Bookings</div>
         <div class="space-y-4">
-            <div class="bg-gray-800 rounded-lg p-4 flex items-center justify-between">
-                <div>
-                    <div class="font-bold text-white">Early Morning</div>
-                    <div class="text-uni-red font-semibold">$10.00</div>
-                    <div class="text-gray-400 text-sm">Duration: 6:00 AM - 8:00 AM</div>
+            @forelse($poolBookings as $booking)
+                <div class="bg-gray-700 p-4 rounded-lg flex flex-col md:flex-row md:items-center md:justify-between">
+                    <div>
+                        <div class="font-semibold text-lg text-white">{{ $booking->session_name }}</div>
+                        <div class="text-gray-400">Date: {{ $booking->date }}</div>
+                        <div class="text-gray-400">Time: {{ $booking->start_time }} - {{ $booking->end_time }}</div>
+                        <div class="text-gray-400">Price: ${{ number_format($booking->price, 2) }}</div>
+                        @if(empty($booking->paid) || !$booking->paid)
+                            <a href="{{ route('stripe.pay', ['type'=>'pool', 'id'=>$booking->id]) }}" class="inline-block mt-2 bg-uni-red hover:bg-red-700 text-white px-4 py-2 rounded font-semibold transition">Pay Now</a>
+                        @else
+                            <span class="inline-block mt-2 text-green-400 font-semibold">Paid</span>
+                        @endif
+                    </div>
                 </div>
-                <button class="bg-uni-red hover:bg-red-700 text-white font-semibold px-5 py-2 rounded transition">Book</button>
-            </div>
-            <div class="bg-gray-800 rounded-lg p-4 flex items-center justify-between">
-                <div>
-                    <div class="font-bold text-white">Afternoon</div>
-                    <div class="text-uni-red font-semibold">$15.00</div>
-                    <div class="text-gray-400 text-sm">Duration: 1:00 PM - 3:00 PM</div>
-                </div>
-                <button class="bg-uni-red hover:bg-red-700 text-white font-semibold px-5 py-2 rounded transition">Book</button>
-            </div>
-            <div class="bg-gray-800 rounded-lg p-4 flex items-center justify-between">
-                <div>
-                    <div class="font-bold text-white">Evening</div>
-                    <div class="text-uni-red font-semibold">$20.00</div>
-                    <div class="text-gray-400 text-sm">Duration: 6:00 PM - 8:00 PM</div>
-                </div>
-                <button class="bg-uni-red hover:bg-red-700 text-white font-semibold px-5 py-2 rounded transition">Book</button>
-            </div>
+            @empty
+                <div class="text-gray-400">You have no pool bookings yet.</div>
+            @endforelse
         </div>
     </div>
 </div>

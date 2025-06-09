@@ -15,30 +15,30 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr class="bg-gray-900 border border-uni-red rounded-lg">
-                        <td class="px-4 py-2">Monthly Membership</td>
-                        <td class="px-4 py-2">April 2, 2024</td>
-                        <td class="px-4 py-2 text-uni-red font-semibold">$29.99</td>
-                        <td class="px-4 py-2"><button class="bg-uni-red hover:bg-red-700 text-white font-semibold px-4 py-2 rounded transition">View</button></td>
-                    </tr>
-                    <tr class="bg-gray-900 border border-uni-red rounded-lg">
-                        <td class="px-4 py-2">Tennis Court Booking</td>
-                        <td class="px-4 py-2">March 25, 2024</td>
-                        <td class="px-4 py-2 text-uni-red font-semibold">$25.00</td>
-                        <td class="px-4 py-2"><button class="bg-uni-red hover:bg-red-700 text-white font-semibold px-4 py-2 rounded transition">View</button></td>
-                    </tr>
-                    <tr class="bg-gray-900 border border-uni-red rounded-lg">
-                        <td class="px-4 py-2">Quarterly Membership</td>
-                        <td class="px-4 py-2">January 1, 2024</td>
-                        <td class="px-4 py-2 text-uni-red font-semibold">$79.99</td>
-                        <td class="px-4 py-2"><button class="bg-uni-red hover:bg-red-700 text-white font-semibold px-4 py-2 rounded transition">View</button></td>
-                    </tr>
-                    <tr class="bg-gray-900 border border-uni-red rounded-lg">
-                        <td class="px-4 py-2">Pool Session</td>
-                        <td class="px-4 py-2">December 12, 2023</td>
-                        <td class="px-4 py-2 text-uni-red font-semibold">$15.00</td>
-                        <td class="px-4 py-2"><button class="bg-uni-red hover:bg-red-700 text-white font-semibold px-4 py-2 rounded transition">View</button></td>
-                    </tr>
+                    @forelse($payments as $payment)
+                        <tr class="bg-gray-900 border border-uni-red rounded-lg">
+                            <td class="px-4 py-2">
+                                {{ $payment->membership->type ?? 'Other Payment' }}
+                                <div class="text-gray-400">Paid at: {{ $payment->paid_at ? \Carbon\Carbon::parse($payment->paid_at)->format('F j, Y') : '-' }}</div>
+                                @if(isset($payment->stripe_receipt_url) && $payment->stripe_receipt_url)
+                                    <a href="{{ $payment->stripe_receipt_url }}" target="_blank" class="inline-block mt-1 bg-blue-600 hover:bg-blue-800 text-white px-3 py-1 rounded text-xs font-semibold transition">Download Receipt</a>
+                                @endif
+                            </td>
+                            <td class="px-4 py-2">
+                                {{ \Carbon\Carbon::parse($payment->paid_at)->format('F j, Y') }}
+                            </td>
+                            <td class="px-4 py-2 text-uni-red font-semibold">
+                                ${{ number_format($payment->amount, 2) }}
+                            </td>
+                            <td class="px-4 py-2">
+                                <button class="bg-uni-red hover:bg-red-700 text-white font-semibold px-4 py-2 rounded transition">View</button>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="4" class="text-center py-8 text-gray-400">No payment history found.</td>
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>
