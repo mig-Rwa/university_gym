@@ -32,21 +32,21 @@ RUN chown -R www-data:www-data storage bootstrap/cache \
  && chmod -R 775 storage bootstrap/cache
 
 # ──────────────────────────────────────────────────────────────
-# Stage 2: runtime
-# ──────────────────────────────────────────────────────────────
-FROM php:8.2-fpm
+ # Stage 2: runtime
+ FROM php:8.2-fpm
 
-WORKDIR /var/www
+ WORKDIR /var/www
 
-# Copy the built app
-COPY --from=build /var/www /var/www
+ COPY --from=build /var/www /var/www
 
-# At container start: pick up Render's .env, then cache config & migrate
+# At container start: pick up Render's .env, then generate key, cache config & migrate
 ENTRYPOINT ["sh","-c","\
   php artisan key:generate --force && \
   php artisan config:cache && \
   php artisan migrate --force && \
   php-fpm \
 "]
-
-EXPOSE 8080
+# At container start: cache config & run migrations, then start PHP-FPM
+ENTRYPOINT ["sh","-c","\
+  php artisan config:cache && \
+  php artisa
