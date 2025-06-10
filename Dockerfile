@@ -40,20 +40,22 @@ RUN composer install --no-dev --optimize-autoloader --no-scripts
 # 5) Copy the rest of your application (including artisan & frontend assets)
 COPY . .
 
- # 6) Install JS deps and build assets
- RUN npm install \
-  && npm run build \
-  && echo "=== public/build contents ===" \
-  && ls -R public/build \
-  && echo "=== end build contents ==="
- RUN npm install \
- && npm run build \
-  && echo "=== POST-BUILD: listing public folder ===" \
-  && ls -R public \
-  && echo "=== POST-BUILD: listing public/build folder (if it exists) ===" \
-  && ls -R public/build || echo "public/build not found" \
-  && echo "=== END OF BUILD DUMP ==="
- 
+ # 6a) Install JS dependencies
+RUN npm install
+
+# 6b) Run the Vite build
+RUN npm run build
+
+# 6c) Debug: list everything under public
+RUN echo "=== LISTING public ===" \
+ && ls -R public \
+ && echo "=== END public ==="
+
+# 6d) Debug: list public/build
+RUN echo "=== LISTING public/build ===" \
+ && ls -R public/build || echo "public/build not found" \
+ && echo "=== END public/build ==="
+
 # 7) Ensure .env exists before Artisan commands
 RUN if [ ! -f .env ]; then cp .env.example .env; fi
 
