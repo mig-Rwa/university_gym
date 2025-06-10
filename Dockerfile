@@ -1,9 +1,13 @@
 # -------- Build Stage --------
-FROM composer:2.7 AS build
+# -------- Build Stage --------
+FROM php:8.2-fpm as build
 
 # Install system dependencies and Node
 RUN apt-get update \
     && apt-get install -y git unzip libpng-dev libonig-dev libxml2-dev zip curl nodejs npm
+
+# Install Composer
+COPY --from=composer:2.7 /usr/bin/composer /usr/bin/composer
 
 # Set working directory
 WORKDIR /var/www
