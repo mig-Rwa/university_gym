@@ -40,9 +40,12 @@ RUN composer install --no-dev --optimize-autoloader --no-scripts
 # 5) Copy the rest of your application (including artisan & frontend assets)
 COPY . .
 
-# 6) Install JS dependencies and build assets
+# 6) Install JS deps and build assets
 RUN npm install \
- && npm run build
+ && npm run build \
+ && echo "=== public/build contents ===" \
+ && ls -R public/build \
+ && echo "=== end build contents ==="
 
 # 7) Ensure .env exists before Artisan commands
 RUN if [ ! -f .env ]; then cp .env.example .env; fi
